@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,7 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->redirectGuestsTo(fn() => null);
+
+        $middleware->encryptCookies(except: [
+            'access_token',
+            'refresh_token',
+            'device_id',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
 
@@ -34,6 +41,14 @@ return Application::configure(basePath: dirname(__DIR__))
             return errorResponse(
                 404,
                 "Not found!"
+            );
+        });
+
+        $exceptions->render(function (AuthenticationException $e, $request) {
+
+            return errorResponse(
+                401,
+                "Unauthenticated!"
             );
         });
 
