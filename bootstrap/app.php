@@ -18,11 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn() => null);
 
-        $middleware->encryptCookies(except: [
-            'access_token',
-            'refresh_token',
-            'device_id',
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
 
